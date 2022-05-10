@@ -42,7 +42,6 @@ spec:
         value: $(params.VERBOSE)
       script: |
         #!/usr/bin/env sh
-        sleep infinity
         set -eu -o pipefail
         if [[ "${PARAM_VERBOSE}" == "true" ]] ; then
           set -x
@@ -51,6 +50,6 @@ spec:
         env
 
         CURRENT_VERSION=$(git tag|grep ^"${PARAM_APP_NAME}-" | sort -n|tail -1)
-        echo "CURRENT VERSION = $CURRENT_VERSION"
-        echo -n "$CURRENT_VERSION" > $(results.current-version)
+        echo -n "CURRENT VERSION = "
+        echo -n "$CURRENT_VERSION" |tee /tekton/results/current-version
 
