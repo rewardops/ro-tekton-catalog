@@ -33,7 +33,7 @@ spec:
       description: Value of the current-version
   steps:
     - name: current-version
-      image: image: $(params.BASE_IMAGE)
+      image: $(params.BASE_IMAGE)
       env:
       - name: PARAM_APP_NAME
         value: $(params.APP_NAME)
