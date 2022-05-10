@@ -20,6 +20,7 @@ spec:
     - name: APP_NAME
       description: app name
       type: string
+      default: "aircanada"
     - name: BASE_IMAGE
       description: the image used where the git binary is
       type: string
