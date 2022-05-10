@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ro-current-version
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Git
+    tekton.dev/tags: git
+    tekton.dev/displayName: "Fetch Current Release"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This task fetches the current version from the latest tag in the repo.
+  workspaces:
+    - name: source
+      description: A workspace that contains the fetched git repository.
+  params:
+    - name: APP_NAME
+      description: app name
+      type: string
+    - name: BASE_IMAGE
+      description: the image used where the git binary is
+      type: string
+      default: "docker.io/alpine/git:v2.26.2@sha256:23618034b0be9205d9cc0846eb711b12ba4c9b468efdd8a59aac1d7b1a23363f"
+    - name: VERBOSE
+      description: Log the commands that are executed during `git-clone`'s operation.
+      type: string
+      default: "true"
+  results:
+    - name: current-version
+      description: Value of the current-version
+  steps:
+    - name: current-version
+      image: image: $(params.BASE_IMAGE)
+      env:
+      - name: PARAM_APP_NAME
+        value: $(params.APP_NAME)
+      - name: PARAM_VERBOSE
+        value: $(params.verbose)
+      script: |
+        #!/usr/bin/env sh
+        set -eu -o pipefail
+        if [[ "${PARAM_VERBOSE}" == "true" ]] ; then
+          set -x
+        fi
+
+        env
+
+        CURRENT_VERSION=$(git tag|grep ^"${PARAM_APP_NAME}-" | sort -n|tail -1)
+        echo "CURRENT VERSION = $CURRENT_VERSION"
+        echo -n "$CURRENT_VERSION" > $(results.current-version)
+
