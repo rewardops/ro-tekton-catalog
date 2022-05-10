@@ -42,6 +42,7 @@ spec:
         value: $(params.VERBOSE)
       script: |
         #!/usr/bin/env sh
+        sleep infinity
         set -eu -o pipefail
         if [[ "${PARAM_VERBOSE}" == "true" ]] ; then
           set -x
