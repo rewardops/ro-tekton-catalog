@@ -38,7 +38,7 @@ spec:
       - name: PARAM_APP_NAME
         value: $(params.APP_NAME)
       - name: PARAM_VERBOSE
-        value: $(params.verbose)
+        value: $(params.VERBOSE)
       script: |
         #!/usr/bin/env sh
         set -eu -o pipefail
