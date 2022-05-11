@@ -17,7 +17,7 @@ spec:
     - name: source
       description: A workspace that contains the fetched git repository.
   params:
-    - name: APP_NAME
+    - name: IMAGE_LABEL
       description: app name
       type: string
       default: "aircanada"
@@ -36,8 +36,8 @@ spec:
     - name: current-version
       image: $(params.BASE_IMAGE)
       env:
-      - name: PARAM_APP_NAME
-        value: $(params.APP_NAME)
+      - name: PARAM_IMAGE_LABEL
+        value: $(params.IMAGE_LABEL)
       - name: PARAM_VERBOSE
         value: $(params.VERBOSE)
       script: |
@@ -49,7 +49,7 @@ spec:
 
         env
 
-        CURRENT_VERSION=$(git tag|grep ^"${PARAM_APP_NAME}-" | sort -n|tail -1)
+        CURRENT_VERSION=$(git tag|grep ^"${PARAM_IMAGE_LABEL}-" | sort -n|tail -1)
         echo -n "CURRENT VERSION = "
         echo -n "$CURRENT_VERSION" |tee /tekton/results/current-version
 
