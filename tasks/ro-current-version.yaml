@@ -28,7 +28,7 @@ spec:
     - name: VERBOSE
       description: Log the commands that are executed during `git-clone`'s operation.
       type: string
-      default: "true"
+      default: "false"
   results:
     - name: current-version
       description: Value of the current-version
