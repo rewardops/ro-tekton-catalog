@@ -46,7 +46,7 @@ spec:
         fi
 
         env
-        
+        pwd
         CURRENT_VERSION=$(git tag -l --sort=-version:refname|grep ^"$(params.IMAGE_LABEL)-v" | head -1)
         
         echo -n "CURRENT VERSION = "
