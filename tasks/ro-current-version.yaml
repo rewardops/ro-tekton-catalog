@@ -37,7 +37,6 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/usr/bin/env sh
-        set -eu -o pipefail
         
         echo "$(params.VERBOSE)"
         
@@ -45,8 +44,6 @@ spec:
           set -x
         fi
 
-        env
-        pwd
         git tag -l --sort=-version:refname|grep ^"$(params.IMAGE_LABEL)-v" | head -1
         
         CURRENT_VERSION=$(git tag -l --sort=-version:refname|grep ^"$(params.IMAGE_LABEL)-v" | head -1)
