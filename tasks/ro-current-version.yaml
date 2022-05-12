@@ -35,21 +35,16 @@ spec:
   steps:
     - name: current-version
       image: $(params.BASE_IMAGE)
-      env:
-      - name: PARAM_IMAGE_LABEL
-        value: $(params.IMAGE_LABEL)
-      - name: PARAM_VERBOSE
-        value: $(params.VERBOSE)
       script: |
         #!/usr/bin/env sh
         set -eu -o pipefail
-        if [[ "${PARAM_VERBOSE}" == "true" ]] ; then
+        if [[ "$(params.VERBOSE)" == "true" ]] ; then
           set -x
         fi
 
         env
 
-        CURRENT_VERSION=$(git tag -l --sort=-version:refname|grep ^"${PARAM_IMAGE_LABEL}-v" | head -1)
+        CURRENT_VERSION=$(git tag -l --sort=-version:refname|grep ^"$(params.IMAGE_LABEL)-v" | head -1)
         echo -n "CURRENT VERSION = "
         echo -n "$CURRENT_VERSION" |tee /tekton/results/current-version
-
+        echo "$(params.VERBOSE)"
