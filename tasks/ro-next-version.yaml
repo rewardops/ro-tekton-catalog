@@ -1,0 +1,81 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ro-current-version
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Git
+    tekton.dev/tags: git
+    tekton.dev/displayName: "Increment Release Version"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This task increments the version number.
+  workspaces:
+    - name: source
+      description: A workspace that contains the fetched git repository.
+  params:
+    - name: IMAGE_LABEL
+      description: app name
+      type: string
+      default: "aircanada"
+    - name: BASE_IMAGE
+      description: the image used where the git binary is
+      type: string
+      default: "docker.io/alpine/git:v2.26.2@sha256:23618034b0be9205d9cc0846eb711b12ba4c9b468efdd8a59aac1d7b1a23363f"
+    - name: VERBOSE
+      description: Log the commands that are executed during `git-clone`'s operation.
+      type: string
+      default: "false"
+  results:
+    - name: next-version
+      description: Increment the current-version
+  steps:
+    - name: next-version
+      image: $(params.BASE_IMAGE)
+      script: |
+        #!/usr/bin/env sh
+        
+        echo "$(params.VERBOSE)"
+        
+        if [[ "$(params.VERBOSE)" == "true" ]] ; then
+          env
+          set -x
+        fi
+
+        THIS="$(params.IMAGE_LABEL)"
+        LAST=$(cat /tekton/results/current-version)
+        DEFAULT="0.0.0"
+
+        if [[ "$PIPELINE_KIND" == "" ]]; then
+          PIPELINE_KIND="pullrequest";
+        fi
+
+        if [[ "$LAST" == "" ]]; then
+          LAST="$THIS-v$DEFAULT";
+        fi
+
+        NAME=$(echo "$LAST"|awk -F'-v' '{ print $1 }')
+        VERS=$(echo "$LAST"|awk -F'-v' '{ print $2 }')
+        MAJOR=$(echo "$VERS"|awk -F'.' '{ print $1 }')
+        MINOR=$(echo "$VERS"|awk -F'.' '{ print $2 }')
+        PATCH=$(echo "$VERS"|awk -F'.' '{ print $3 }')
+
+        case $PIPELINE_KIND in
+          pullrequest)
+            let PATCH=PATCH+1
+            ;;
+          release)
+            let MINOR=MINOR+1
+            PATCH="0"
+            ;;
+        esac
+
+        VERSION="$NAME"-v"$MAJOR.$MINOR.$PATCH"
+        echo "Previous version = $LAST"
+        echo "New version = $VERSION"
+        echo -n $VERSION > VERSION
+        echo -n v"$MAJOR.$MINOR.$PATCH" |tee /tekton/results/next-version
+
