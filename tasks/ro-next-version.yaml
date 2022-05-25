@@ -30,10 +30,10 @@ spec:
       type: string
       default: "false"
   results:
-    - name: next-version
+    - name: ro-next-version
       description: Increment the current-version
   steps:
-    - name: next-version
+    - name: ro-next-version
       image: $(params.BASE_IMAGE)
       script: |
         #!/usr/bin/env sh

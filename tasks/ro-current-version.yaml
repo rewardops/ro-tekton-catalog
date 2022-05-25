@@ -30,10 +30,10 @@ spec:
       type: string
       default: "false"
   results:
-    - name: current-version
+    - name: ro-current-version
       description: Value of the current-version
   steps:
-    - name: current-version
+    - name: ro-current-version
       image: $(params.BASE_IMAGE)
       script: |
         #!/usr/bin/env sh
