@@ -49,8 +49,12 @@ spec:
         LAST=$(cat /tekton/results/current-version)
         DEFAULT="0.0.0"
 
-        if [[ "$PIPELINE_KIND" == "" ]]; then
-          PIPELINE_KIND="pullrequest";
+        if o=$(git shortlog $(cat /tekton/results/current-version)..HEAD|grep -i 'feat.*:'); then
+          SEMVER_UPDATE="minor"
+        elif o=$(git shortlog $(cat /tekton/results/current-version)..HEAD|grep -i 'breaking.change.*:'); then
+          SEMVER_UPDATE="major"
+        else
+          SEMVER_UPDATE="patch";
         fi
 
         if [[ "$LAST" == "" ]]; then
@@ -63,12 +67,17 @@ spec:
         MINOR=$(echo "$VERS"|awk -F'.' '{ print $2 }')
         PATCH=$(echo "$VERS"|awk -F'.' '{ print $3 }')
 
-        case $PIPELINE_KIND in
-          pullrequest)
+        case $SEMVER_UPDATE in
+          patch)
             let PATCH=PATCH+1
             ;;
-          release)
+          minor)
             let MINOR=MINOR+1
+            PATCH="0"
+            ;;
+          major)
+            let MAJOR=MAJOR+1
+            MINOR="0"
             PATCH="0"
             ;;
         esac
