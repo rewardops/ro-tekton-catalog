@@ -47,8 +47,6 @@ spec:
           set -x
         fi
 
-        sleep infinity
-
         jx gitops variables
         jx gitops pr variables
         sed -i "s/^export APP_NAME=.*/export APP_NAME=\"$(params.IMAGE_LABEL)\"/" /workspace/source/.jx/variables.sh
