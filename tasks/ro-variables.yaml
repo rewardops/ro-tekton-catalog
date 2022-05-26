@@ -21,10 +21,6 @@ spec:
       description: app name
       type: string
       default: "default"
-    - name: BASE_IMAGE
-      description: the image used where the jx-variables binary is
-      type: string
-      default: "ghcr.io/jenkins-x/jx-boot:3.2.264"
     - name: VERBOSE
       description: Log the commands that are executed during `git-clone`'s operation.
       type: string
@@ -34,7 +30,7 @@ spec:
       description: populate variables.sh
   steps:
     - name: ro-variables
-      image: $(params.BASE_IMAGE)
+      image: ghcr.io/jenkins-x/jx-boot:3.2.264
       script: |
         #!/usr/bin/env sh
 
@@ -42,7 +38,6 @@ spec:
           env
           echo ">>> Params:"
           echo ">>> IMAGE_LABEL: $(params.IMAGE_LABEL)"
-          echo ">>> BASE_IMAGE: $(params.BASE_IMAGE)"
           echo ">>> VERBOSE: $(params.VERBOSE)"
           set -x
         fi
