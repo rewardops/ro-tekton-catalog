@@ -33,7 +33,7 @@ spec:
     - name: ro-variables
       description: populate variables.sh
   steps:
-    - name: jx-variables
+    - name: ro-variables
       image: $(params.BASE_IMAGE)
       script: |
         #!/usr/bin/env sh
