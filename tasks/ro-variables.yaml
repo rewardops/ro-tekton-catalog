@@ -47,10 +47,10 @@ spec:
         sed -i "s/^export APP_NAME=.*/export APP_NAME=\"$(params.IMAGE_LABEL)\"/" /workspace/source/.jx/variables.sh
         
         if [ -f /tekton/results/current-version ]; then
-          echo "CURRENT_VERSION=$(cat /tekton/results/current-version)" >> /workspace/source/.jx/variables.sh
+          echo "export CURRENT_VERSION=$(cat /tekton/results/current-version)" >> /workspace/source/.jx/variables.sh
         fi
 
         if [ -f /tekton/results/next-version ]; then
-          echo "SEMVER=$(cat /tekton/results/next-version)" >> /workspace/source/.jx/variables.sh
+          echo "export SEMVER=$(cat /tekton/results/next-version)" >> /workspace/source/.jx/variables.sh
         fi
 
