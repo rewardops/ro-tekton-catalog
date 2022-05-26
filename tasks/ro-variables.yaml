@@ -8,11 +8,11 @@ metadata:
     tekton.dev/pipelines.minVersion: "0.12.1"
     tekton.dev/categories: Git
     tekton.dev/tags: git
-    tekton.dev/displayName: "Fetch Current Release"
+    tekton.dev/displayName: "In-house variables"
     tekton.dev/platforms: "linux/amd64"
 spec:
   description: >-
-    This task fetches the current version from the latest tag in the repo.
+    Add/Replace vars to variables.sh.
   workspaces:
     - name: source
       description: A workspace that contains the fetched git repository.
@@ -22,33 +22,36 @@ spec:
       type: string
       default: "default"
     - name: BASE_IMAGE
-      description: the image used where the git binary is
+      description: the image used where the jx-variables binary is
       type: string
-      default: "docker.io/alpine/git:v2.26.2@sha256:23618034b0be9205d9cc0846eb711b12ba4c9b468efdd8a59aac1d7b1a23363f"
+      default: "ghcr.io/jenkins-x/jx-boot:3.2.264"
     - name: VERBOSE
       description: Log the commands that are executed during `git-clone`'s operation.
       type: string
       default: "false"
   results:
-    - name: ro-current-version
-      description: Value of the current-version
+    - name: ro-variables
+      description: populate variables.sh
   steps:
-    - name: ro-current-version
+    - name: jx-variables
       image: $(params.BASE_IMAGE)
       script: |
         #!/usr/bin/env sh
-        
+
         if [[ "$(params.VERBOSE)" == "true" ]] ; then
           env
           set -x
         fi
 
-        git tag -l --sort=-version:refname|grep ^"$(params.IMAGE_LABEL)-v" | head -1
+        jx gitops variables
+        jx gitops pr variables
+        sed -i "s/^export APP_NAME=.*/export APP_NAME=\"$(params.IMAGE_LABEL)\"/" /workspace/source/.jx/variables.sh
         
-        CURRENT_VERSION=$(git tag -l --sort=-version:refname|grep ^"$(params.IMAGE_LABEL)-v" | head -1)
-        
-        echo -n "CURRENT VERSION = "
-        echo -n "$CURRENT_VERSION" |tee /tekton/results/current-version
-        
+        if [ -f /tekton/results/current-version ]; then
+          echo "CURRENT_VERSION=$(cat /tekton/results/current-version)" >> /workspace/source/.jx/variables.sh
+        fi
 
+        if [ -f /tekton/results/next-version ]; then
+          echo "SEMVER=$(cat /tekton/results/next-version)" >> /workspace/source/.jx/variables.sh
+        fi
 
