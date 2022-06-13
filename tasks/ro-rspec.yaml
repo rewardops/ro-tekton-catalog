@@ -30,7 +30,7 @@ spec:
         set -x
         gem update --system 3.0.6 
         gem install bundler:1.17.3 --conservative
-   sidecars:
-     - image: 'postgres:12.9'
-       name: postgres
+  sidecars:
+    - image: 'postgres:12.9'
+      name: postgres
         
