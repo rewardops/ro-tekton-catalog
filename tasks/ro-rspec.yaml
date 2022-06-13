@@ -31,4 +31,5 @@ spec:
 
 
         echo -n "HELLO WORLD"
-        ls -lah /pangea
+        echo -n "ls -lah /pangea"
+        echo -n $(ls -lah /pangea)
