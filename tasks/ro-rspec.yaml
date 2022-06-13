@@ -33,4 +33,9 @@ spec:
   sidecars:
     - image: postgres:12.9
       name: postgres
+      env:
+      - name: POSTGRES_USER
+        value: postgres
+      - name: POSTGRES_PASSWORD
+        value: postgres
         
