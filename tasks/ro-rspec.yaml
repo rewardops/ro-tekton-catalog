@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ro-rspec
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    RSpec task 
+  workspaces:
+    - name: source
+      description: A workspace that let's you run RSpec.
+  params:
+    - name: BASE_IMAGE
+      description: Latest Pangea Development Image 
+      type: string
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pangea_build:latest"
+  results:
+    - name: ro-rspec
+      description: Increment the current-version
+  steps:
+    - name: ro-rspec
+      image: $(params.BASE_IMAGE)
+      script: |
+        #!/usr/bin/env sh
+        echo ">>> Params:"
+        echo ">>> BASE_IMAGE: $(params.BASE_IMAGE)"
+        set -x
+
+
+        echo -n "HELLO WORLD"
+
