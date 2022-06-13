@@ -31,4 +31,4 @@ spec:
 
 
         echo -n "HELLO WORLD"
-
+        ls -lah /pangea
