@@ -23,17 +23,9 @@ spec:
   steps:
     - name: ro-rspec
       image: $(params.BASE_IMAGE)
-      env:
-      - name: KNAPSACK_PRO_FIXED_QUEUE_SPLIT
-        valueFrom:
-          secretKeyRef:
-            name: pangea-ci
-            key: KNAPSACK_PRO_FIXED_QUEUE_SPLIT
-      - name: KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC
-        valueFrom:
-          secretKeyRef:
-            name: pangea-ci
-            key: KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC
+      envFrom:
+      - secretRef:
+          name: pangea-ci
       script: |
         #!/usr/bin/env sh
         echo ">>> Params:"
