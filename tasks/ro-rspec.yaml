@@ -21,7 +21,7 @@ spec:
     - name: ro-rspec
       description: Run Tests
   steps:
-    - name: ro-rspec
+    - name: ro-rspec0
       image: $(params.BASE_IMAGE)
       envFrom:
       - secretRef:
@@ -31,16 +31,29 @@ spec:
         set -x
         source .jx/variables.sh
         
-        echo ">>> Params:"
-        echo ">>> BASE_IMAGE: $(params.BASE_IMAGE)"
+        export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
+        export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
+        export KNAPSACK_PRO_CI_NODE_INDEX=0
+        
+        sleep 10s
+        ./scripts/ci/tekton_ruby_rspec.sh
+    - name: ro-rspec1
+      image: $(params.BASE_IMAGE)
+      envFrom:
+      - secretRef:
+          name: pangea-ci
+      script: |
+        #!/usr/bin/env sh
+        set -x
+        source .jx/variables.sh
         
         export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
+        export KNAPSACK_PRO_CI_NODE_INDEX=1
         
-        gem update --system 3.0.6 
-        gem install bundler:1.17.3 --conservative
         sleep 10s
         ./scripts/ci/tekton_ruby_rspec.sh
+
   sidecars:
     - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/postgres:12.9
       name: postgres
