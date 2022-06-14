@@ -40,4 +40,14 @@ spec:
         value: postgres
       - name: POSTGRES_PASSWORD
         value: postgres
+      - name: KNAPSACK_PRO_FIXED_QUEUE_SPLIT
+        valueFrom:
+          secretKeyRef:
+            name: pangea-ci
+            key: KNAPSACK_PRO_FIXED_QUEUE_SPLIT
+      - name: KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC
+        valueFrom:
+          secretKeyRef:
+            name: pangea-ci
+            key: KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC
         
