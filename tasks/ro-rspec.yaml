@@ -33,7 +33,7 @@ spec:
         sleep 10s
         ./scripts/ci/tekton_ruby_rspec.sh
   sidecars:
-    - image: postgres:12.9
+    - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/postgres:12.9
       name: postgres
       env:
       - name: POSTGRES_USER
