@@ -21,7 +21,7 @@ spec:
     - name: ro-rspec
       description: Run Tests
   steps:
-    - name: ro-rspec0
+    - name: ro-rspec
       image: $(params.BASE_IMAGE)
       envFrom:
       - secretRef:
@@ -33,23 +33,6 @@ spec:
         
         export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
-        export KNAPSACK_PRO_CI_NODE_INDEX=0
-        
-        sleep 10s
-        ./scripts/ci/tekton_ruby_rspec.sh
-    - name: ro-rspec1
-      image: $(params.BASE_IMAGE)
-      envFrom:
-      - secretRef:
-          name: pangea-ci
-      script: |
-        #!/usr/bin/env sh
-        set -x
-        source .jx/variables.sh
-        
-        export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
-        export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
-        export KNAPSACK_PRO_CI_NODE_INDEX=1
         
         sleep 10s
         ./scripts/ci/tekton_ruby_rspec.sh
