@@ -1,0 +1,42 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ro-rspec
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    ruby_minitest task 
+  workspaces:
+    - name: source
+      description: A workspace that let's you run ruby_minitest.
+  params:
+    - name: BASE_IMAGE
+      description: Latest pii_service image 
+      type: string
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_service:1.0.6"
+  results:
+    - name: ro-ruby_minitest
+      description: Run Tests
+  steps:
+    - name: ro-ruby_minitest
+      image: $(params.BASE_IMAGE)
+      envFrom:
+      script: |
+        #!/bin/sh
+        /bin/wait-for-it.sh pii-servicedb:5432 && \
+        /bin/sh scripts/ci/ruby_minitest.sh
+
+  sidecars:
+    - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_servicedb:1.0.6
+      name: pii-servicedb-minitest
+      env:
+      - name: POSTGRES_USER
+        value: "pii"
+      - name: POSTGRES_PASSWORD
+        value: "pii"
+      - name: POSTGRES_DB
+        value: "pii"
+      
