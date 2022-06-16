@@ -25,27 +25,27 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/bin/sh
-        /bin/wait-for-it.sh pii-servicedb-minitest:5432 && \
+        /bin/wait-for-it.sh pii-servicedb:5432 && \
         /bin/sh scripts/ci/ruby_minitest.sh
 
-#  sidecars:
-#    - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_servicedb:1.0.6
-#      name: pii-servicedb-minitest
-#      env:
-#      - name: POSTGRES_USER
-#        valueFrom:
-#          secretKeyRef:
-#            name: pii-service
-#            key: POSTGRES_USER
-#      - name: POSTGRES_PASSWORD
-#        valueFrom:
-#          secretKeyRef:
-#            name: pii-service
-#            key: POSTGRES_PASSWORD
-#      - name: POSTGRES_DB
-#        valueFrom:
-#          secretKeyRef:
-#            name: pii-service
-#            key: POSTGRES_DB
-#
-#      
+  sidecars:
+    - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_servicedb:1.0.6
+      name: pii-servicedb-minitest
+      env:
+      - name: POSTGRES_USER
+        valueFrom:
+          secretKeyRef:
+            name: pii-service
+            key: POSTGRES_USER
+      - name: POSTGRES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: pii-service
+            key: POSTGRES_PASSWORD
+      - name: POSTGRES_DB
+        valueFrom:
+          secretKeyRef:
+            name: pii-service
+            key: POSTGRES_DB
+
+      
