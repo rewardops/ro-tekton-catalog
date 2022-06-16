@@ -23,9 +23,6 @@ spec:
   steps:
     - name: minitest
       image: $(params.BASE_IMAGE)
-      envFrom:
-      - secretRef:
-        name: pii-service
       script: |
         #!/bin/sh
         /bin/wait-for-it.sh pii-servicedb-minitest:5432 && \
