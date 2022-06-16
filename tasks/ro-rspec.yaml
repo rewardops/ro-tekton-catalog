@@ -12,6 +12,13 @@ spec:
   workspaces:
     - name: source
       description: A workspace that let's you run RSpec.
+      volumeClaimTemplate:  # PVC created this way will be cleaned-up after TaskRun/PipelineRun completes!
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
   params:
     - name: BASE_IMAGE
       description: Latest Pangea Development Image 
@@ -33,7 +40,7 @@ spec:
         
         export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
-        
+        echo "INDEX NUMBER == $KNAPSACK_PRO_CI_NODE_INDEX"
         sleep 10s
         ./scripts/ci/tekton_ruby_rspec.sh
 
