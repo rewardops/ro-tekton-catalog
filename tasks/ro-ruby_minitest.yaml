@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: ro-rspec
+  name: minitest
   labels:
     app.kubernetes.io/version: "0.2"
   annotations:
@@ -18,10 +18,10 @@ spec:
       type: string
       default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_service:1.0.6"
   results:
-    - name: ro-ruby_minitest
+    - name: minitest
       description: Run Tests
   steps:
-    - name: ro-ruby_minitest
+    - name: minitest
       image: $(params.BASE_IMAGE)
       envFrom:
       - secretRef:
