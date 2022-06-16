@@ -24,9 +24,11 @@ spec:
     - name: ro-ruby_minitest
       image: $(params.BASE_IMAGE)
       envFrom:
+      - secretRef:
+        name: pii-service
       script: |
         #!/bin/sh
-        /bin/wait-for-it.sh pii-servicedb:5432 && \
+        /bin/wait-for-it.sh pii-servicedb-minitest:5432 && \
         /bin/sh scripts/ci/ruby_minitest.sh
 
   sidecars:
@@ -34,9 +36,19 @@ spec:
       name: pii-servicedb-minitest
       env:
       - name: POSTGRES_USER
-        value: "pii"
+        valueFrom:
+          secretKeyRef:
+            name: pii-service
+            key: POSTGRES_USER
       - name: POSTGRES_PASSWORD
-        value: "pii"
+        valueFrom:
+          secretKeyRef:
+            name: pii-service
+            key: POSTGRES_PASSWORD
       - name: POSTGRES_DB
-        value: "pii"
+        valueFrom:
+          secretKeyRef:
+            name: pii-service
+            key: POSTGRES_DB
+
       
