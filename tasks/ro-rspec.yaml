@@ -12,13 +12,6 @@ spec:
   workspaces:
     - name: source
       description: A workspace that let's you run RSpec.
-      volumeClaimTemplate:  # PVC created this way will be cleaned-up after TaskRun/PipelineRun completes!
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 10Gi
   params:
     - name: BASE_IMAGE
       description: Latest Pangea Development Image 
