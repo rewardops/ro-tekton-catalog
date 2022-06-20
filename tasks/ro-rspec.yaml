@@ -34,7 +34,7 @@ spec:
       - secretRef:
           name: pangea-ci
       script: |
-        #!/usr/bin/env sh
+        #!/usr/bin/env bash
         set -x
         source .jx/variables.sh
         
