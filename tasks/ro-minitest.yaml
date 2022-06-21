@@ -25,7 +25,6 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/bin/sh
-        sleep infinity
         /bin/wait-for-it.sh localhost:5432 && \
         /bin/sh scripts/ci/ruby_minitest.sh
 
