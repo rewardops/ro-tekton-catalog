@@ -25,7 +25,7 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/bin/sh
-        /bin/wait-for-it.sh pii-servicedb:5432 && \
+        /bin/wait-for-it.sh pii-servicedb-minitest:5432 && \
         /bin/sh scripts/ci/ruby_minitest.sh
 
   sidecars:
