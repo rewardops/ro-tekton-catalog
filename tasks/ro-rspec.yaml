@@ -9,9 +9,6 @@ metadata:
 spec:
   description: >-
     RSpec task 
-  workspaces:
-    - name: source 
-      description: A workspace that let's you run RSpec.
   params:
     - name: BASE_IMAGE
       description: Latest Pangea Development Image 
