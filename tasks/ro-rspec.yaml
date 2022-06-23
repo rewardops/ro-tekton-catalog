@@ -10,7 +10,7 @@ spec:
   description: >-
     RSpec task 
   workspaces:
-    - name: source
+    - name: output
       description: A workspace that let's you run RSpec.
   params:
     - name: BASE_IMAGE
@@ -35,7 +35,6 @@ spec:
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
         echo "INDEX NUMBER == $KNAPSACK_PRO_CI_NODE_INDEX"
         sleep 10s
-        ls -lah
         cd $(workspaces.source.path)
         ./scripts/ci/tekton_ruby_rspec.sh
 
