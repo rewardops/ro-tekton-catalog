@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: brakeman
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    ruby_brakeman task 
+  workspaces:
+    - name: source
+      description: A workspace that let's you run ruby_brakeman.
+  params:
+    - name: BASE_IMAGE
+      description: Latest pii_service image 
+      type: string
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_service:1.0.6"
+  results:
+    - name: brakeman
+      description: Run Tests
+  steps:
+    - name: brakeman
+      image: $(params.BASE_IMAGE)
+      script: |
+        #!/bin/sh
+        /bin/sh scripts/ci/ruby_brakeman.sh
+
