@@ -9,9 +9,6 @@ metadata:
 spec:
   description: >-
     RSpec task 
-  workspaces:
-    - name: source
-      description: A workspace that let's you run RSpec.
   params:
     - name: BASE_IMAGE
       description: Latest Pangea Development Image 
@@ -29,12 +26,13 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -x
-        source .jx/variables.sh
+        source $(workspaces.source.path)/.jx/variables.sh
         
         export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
         echo "INDEX NUMBER == $KNAPSACK_PRO_CI_NODE_INDEX"
         sleep 10s
+        cd $(workspaces.source.path)
         ./scripts/ci/tekton_ruby_rspec.sh
 
   sidecars:
