@@ -25,6 +25,5 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/bin/sh
-        sleep infinity
         /bin/sh scripts/ci/ruby_brakeman.sh
 
