@@ -10,7 +10,7 @@ spec:
   description: >-
     RSpec task 
   workspaces:
-    - name: output
+    - name: source 
       description: A workspace that let's you run RSpec.
   params:
     - name: BASE_IMAGE
@@ -29,7 +29,7 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -x
-        source $(workspaces.output.path)/.jx/variables.sh
+        source $(workspaces.source.path)/.jx/variables.sh
         
         export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
