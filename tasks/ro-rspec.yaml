@@ -32,7 +32,7 @@ spec:
         echo "INDEX NUMBER == $KNAPSACK_PRO_CI_NODE_INDEX"
         sleep 10s
         pwd
-        ls -lahr /workspace/
+        ls -lahR /workspace/
         /workspace/source/scripts/ci/tekton_ruby_rspec.sh
 
   sidecars:
