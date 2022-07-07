@@ -26,12 +26,12 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -x
-        cd /workspace/source
+        cd /workspace/pangea
         export KNAPSACK_PRO_REPOSITORY_ADAPTER=git
-        export KNAPSACK_PRO_PROJECT_DIR=/workspace/source
+        export KNAPSACK_PRO_PROJECT_DIR=/workspace/pangea
         echo "INDEX NUMBER == $KNAPSACK_PRO_CI_NODE_INDEX"
         sleep 10s
-        /workspace/source/scripts/ci/tekton_ruby_rspec.sh
+        ./scripts/ci/tekton_ruby_rspec.sh
 
   sidecars:
     - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/postgres:12.9
