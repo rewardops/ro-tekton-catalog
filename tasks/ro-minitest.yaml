@@ -16,7 +16,7 @@ spec:
     - name: BASE_IMAGE
       description: Latest pii_service image 
       type: string
-      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii:latest"
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii-service:latest"
   results:
     - name: minitest
       description: Run Tests
@@ -29,7 +29,7 @@ spec:
         /bin/sh scripts/ci/ruby_minitest.sh
 
   sidecars:
-    - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/piipreviewdb:latest
+    - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii-servicedb:latest
       name: pii-servicedb
       env:
       - name: POSTGRES_USER

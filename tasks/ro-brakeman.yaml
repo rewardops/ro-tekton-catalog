@@ -16,7 +16,7 @@ spec:
     - name: BASE_IMAGE
       description: Latest pii_service image 
       type: string
-      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii:latest"
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii-service:latest"
   results:
     - name: brakeman
       description: Run Tests
