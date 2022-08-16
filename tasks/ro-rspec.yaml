@@ -14,10 +14,6 @@ spec:
       description: Latest Pangea Development Image 
       type: string
       default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pangea_build:latest"
-    - name: FRONT_END 
-      description: Run Front End Tests 
-      type: string
-      default: ""
   results:
     - name: ro-rspec
       description: Run Tests
@@ -35,7 +31,7 @@ spec:
         export KNAPSACK_PRO_PROJECT_DIR=/workspace/pangea
         echo "INDEX NUMBER == $KNAPSACK_PRO_CI_NODE_INDEX"
         sleep 10s
-        ./scripts/ci/tekton_ruby_rspec.sh $(params.FRONT_END)
+        ./scripts/ci/tekton_ruby_rspec.sh $FRONT_END
 
   sidecars:
     - image: 016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/postgres:12.9
