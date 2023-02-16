@@ -33,19 +33,8 @@ spec:
       name: pii-servicedb
       env:
       - name: POSTGRES_USER
-        valueFrom:
-          secretKeyRef:
-            name: pii-service
-            key: POSTGRES_USER
+        value: postgres
       - name: POSTGRES_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: pii-service
-            key: POSTGRES_PASSWORD
+        value: postgres
       - name: POSTGRES_DB
-        valueFrom:
-          secretKeyRef:
-            name: pii-service
-            key: POSTGRES_DB
-
-      
+        value: pii_test
