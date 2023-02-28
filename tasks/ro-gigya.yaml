@@ -21,6 +21,11 @@ spec:
     - name: gigya
       description: Update OIDC
   steps:
+    - name: add requests
+      image: $(params.BASE_IMAGE)
+      script: |
+        #!/bin/sh
+        pip install requests
     - name: gigya
       image: $(params.BASE_IMAGE)
       script: |
