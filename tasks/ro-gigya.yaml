@@ -16,16 +16,11 @@ spec:
     - name: BASE_IMAGE
       description: Latest pii_service image 
       type: string
-      default: "public.ecr.aws/docker/library/python:3.9.16-slim-bullseye"
+      default: "broadinstitute/python-requests:3"
   results:
     - name: gigya
       description: Update OIDC
   steps:
-    - name: requests
-      image: $(params.BASE_IMAGE)
-      script: |
-        #!/bin/sh
-        pip install requests
     - name: gigya
       image: $(params.BASE_IMAGE)
       script: |
