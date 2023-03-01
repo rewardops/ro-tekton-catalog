@@ -25,4 +25,5 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/bin/sh -x
-        ./main.py
+        /workspace/source/main.py
+        sleep infinity
