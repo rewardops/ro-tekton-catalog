@@ -8,7 +8,7 @@ metadata:
     tekton.dev/platforms: "linux/amd64"
 spec:
   description: >-
-    ruby_brakeman task 
+    gigya_script task 
   workspaces:
     - name: source
       description: Run Gigya script to update OIDC
@@ -16,7 +16,7 @@ spec:
     - name: BASE_IMAGE
       description: Latest pii_service image 
       type: string
-      default: "broadinstitute/python-requests:3"
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/python3-requests:3.10-alpine3.17"
   results:
     - name: gigya
       description: Update OIDC
@@ -24,116 +24,5 @@ spec:
     - name: gigya
       image: $(params.BASE_IMAGE)
       script: |
-        #!/usr/bin/env python3
-        from os import environ as env
-        import re
-        import requests
-        
-        APIKEY = env.get('APIKEY')
-        CLIENTID = env.get('CLIENTID')
-        USERKEY = env.get('USERKEY')
-        SECRETKEY = env.get('SECRETKEY')
-        GITHUB = env.get('GITHUB')
-        
-        if APIKEY is None:
-            print("Please set APIKEY")
-            exit(1)
-        if CLIENTID is None:
-            print("Please set CLIENTID")
-            exit(1)
-        if USERKEY is None:
-            print("Please set USERKEY")
-            exit(1)
-        if SECRETKEY is None: 
-            print("Please set SECRETKEY")
-            exit(1)
-        if GITHUB is None:
-            print("Please set GITHUB")
-            exit(1)
-        
-        def get_oidc():
-            """ Get OIDC output from Gigya for processing """
-            request = f"https://accounts.us1.gigya.com/fidm.oidc.op.getRP?apiKey=%s&userKey=%s&secret=%s&clientID=%s" % (APIKEY, USERKEY, SECRETKEY, CLIENTID)
-            try:
-                r = requests.get(request,timeout=30)
-            except requests.exceptions.requestexception as e:  
-                raise SystemExit(e)
-        
-            output = r.json()
-            return output
-        
-        def update_oidc(oidcResponse, redirectUris):
-            """ Update OIDC List on Gigya with a POST """
-            description = str(oidcResponse['description'])
-            allowedScopes = str(oidcResponse['allowedScopes'])
-            supportedResponseTypes = str(oidcResponse['supportedResponseTypes'])
-            accessTokenLifetime = str(oidcResponse['accessTokenLifetime'])
-            accessTokenFormat = str(oidcResponse['accessTokenFormat'])
-            idTokenContent = str(oidcResponse['idTokenContent'])
-            subjectIdentifierType = str(oidcResponse['subjectIdentifierType'])
-        
-            post = "https://accounts.us1.gigya.com/fidm.oidc.op.updateRP?apiKey=%s&userKey=%s&secret=%s&clientID=%s" % (APIKEY, USERKEY, SECRETKEY, CLIENTID)
-            post = "%s&description=%s&allowedScopes=%s&supportedResponseTypes=%s&accessTokenLifetime=%s&accessTokenFormat=%s&idTokenContent=%s&subjectIdentifierType=%s&redirectUris=%s" % (
-                post, description, allowedScopes, supportedResponseTypes, accessTokenLifetime, accessTokenFormat, idTokenContent, subjectIdentifierType, redirectUris
-            )
-            try:
-                p = requests.post(post)
-            except requests.exceptions.requestexception as e:  
-                raise SystemExit(e)
-        
-            print(p.text)
-            return p.status_code
-        
-        def get_prs():
-            """ Get all PRs from github private repo MX with pagination and 100 per page """
-            prURLs = []
-            
-            headers = requests.structures.CaseInsensitiveDict()
-            headers["Accept"] = "application/vnd.github+json"
-            headers["Authorization"] = f"Bearer %s" % (GITHUB)
-            page = 1    
-            while True: 
-                try:
-                    request = requests.get('https://api.github.com/repos/rewardops/mx/pulls?state=open&per_page=100&page=' + str(page) , headers=headers)
-                except requests.exceptions.requestexception as e:  
-                    raise SystemExit(e)
-        
-                for pr in request.json():
-                    prURLs.append(f"https://aircanada-pr%s.jx.rewardops.io/api/v1/auth/silentLogin" % (pr['number']))
-        
-                if request.headers.get('link', None) is None:
-                    break
-                page+=1 
-            prURLs.sort()
-            return prURLs
-        
-        def compare(prList,oidcList):
-            """ Compare both PR and OIDC List and determine if updating is required """
-            for pr in prList:
-                if pr not in oidcList:
-                    break
-            else:
-                return None
-        
-            oidcUpdated = []
-            for oidc in oidcList:
-                if not  re.search("aircanada-pr.*.jx.rewardops.io", oidc):
-                    oidcUpdated.append(oidc)
-        
-            oidcUpdated.extend(prList)
-            return oidcUpdated
-        
-        def main():
-            oidcResponse = get_oidc()
-            oidcList = oidcResponse['redirectUris']
-            prList = get_prs()
-            
-            updateNeeded = compare(prList, oidcList)
-            
-            if updateNeeded is None:
-                print("No updating")
-            else:
-                status =update_oidc(oidcResponse, updateNeeded)
-        
-        if __name__ == "__main__":
-            main()
+        #!/bin/sh -x
+        ./main.py
