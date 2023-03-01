@@ -35,4 +35,3 @@ spec:
       script: |
         #!/bin/sh -x
         /app/main.py
-        sleep infinity
