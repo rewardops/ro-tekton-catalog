@@ -27,8 +27,8 @@ spec:
       - name: GITHUB
         valueFrom:
           secretKeyRef:
-          name: tekton-git
-          key: password
+            name: tekton-git
+            key: password
       envFrom:
       - secretRef:
           name: gigya-creds
