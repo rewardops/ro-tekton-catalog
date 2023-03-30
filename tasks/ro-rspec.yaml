@@ -41,4 +41,5 @@ spec:
         value: postgres
       - name: POSTGRES_PASSWORD
         value: postgres
-      
+      - name: POSTGRES_DB
+        value: pangea_test
