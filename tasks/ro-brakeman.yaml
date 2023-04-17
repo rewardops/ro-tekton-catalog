@@ -25,5 +25,12 @@ spec:
       image: $(params.BASE_IMAGE)
       script: |
         #!/bin/sh
+        [ ! -d /config ] && mkdir /config && \
+        cat << EOF > /config/pii-mapping.yml
+        proxy_backend:
+          mapping:
+            - pii_hostname: pii-service
+              api_upstream: qa-api.rewardops.io
+        EOF
         /bin/sh scripts/ci/ruby_brakeman.sh
 
