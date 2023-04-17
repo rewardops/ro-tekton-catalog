@@ -32,7 +32,7 @@ spec:
           mapping:
             - pii_hostname: pii-service
               api_upstream: qa-api.rewardops.io
-        EOF && \
+        EOF
         /bin/sh scripts/ci/ruby_minitest.sh
 
   sidecars:
