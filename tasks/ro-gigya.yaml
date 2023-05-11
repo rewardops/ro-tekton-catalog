@@ -16,7 +16,7 @@ spec:
     - name: BASE_IMAGE
       description: Latest pii_service image 
       type: string
-      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/python3-requests:3.10-alpine3.17"
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/python3-requests:latest"
   results:
     - name: gigya
       description: Update OIDC
