@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: gigya
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    gigya_script task 
+  workspaces:
+    - name: source
+      description: Run Gigya script to update OIDC
+  params:
+    - name: BASE_IMAGE
+      description: Latest pii_service image 
+      type: string
+      default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/python3-requests:latest"
+  results:
+    - name: gigya
+      description: Update OIDC
+  steps:
+    - name: gigya
+      image: $(params.BASE_IMAGE)
+      env:
+      - name: GITHUB
+        valueFrom:
+          secretKeyRef:
+            name: tekton-git
+            key: password
+      envFrom:
+      - secretRef:
+          name: gigya-creds
+      script: |
+        #!/bin/sh -x
+        /app/main.py
