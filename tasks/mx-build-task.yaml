@@ -80,8 +80,8 @@ spec:
           cpu: 500m
           memory: 1000Mi
         limits:
-          cpu: 1000m
-          memory: 2000Mi
+          cpu: 2000m
+          memory: 4000Mi
       script: |
         #!/busybox/sh
         source .jx/variables.sh
@@ -89,9 +89,6 @@ spec:
         echo "VERSION = $VERSION"
 
         cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-
-        export NPM_TOKEN=$NPM_TOKEN
-        echo "The token is $NPM_TOKEN"
 
         echo ">>> Building PR mx-$(params.APP_NAME)"
         /kaniko/executor \
