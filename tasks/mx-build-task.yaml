@@ -27,8 +27,6 @@ spec:
 
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
     - name: jx-variables
-      # runAfter:
-      #   - fetch-repository
       image: ghcr.io/jenkins-x/jx-boot:3.10.86
       script: |
         #!/usr/bin/env sh
