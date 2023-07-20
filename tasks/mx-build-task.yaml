@@ -1,0 +1,109 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mx-build-task
+spec:
+  params:
+    - name: APP_NAME
+      type: string
+  stepTemplate:
+    env:
+      - name: NPM_CONFIG_USERCONFIG
+        value: /tekton/home/npm/.npmrc
+      - name: HOME
+        value: /tekton/home
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1000Mi
+    workingDir: /workspace/source
+  steps:
+    # https://github.com/jenkins-x/jx3-pipeline-catalog/blob/master/tasks/git-clone/git-clone-pr.yaml
+    - name: fetch-repository
+      image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+
+    # https://github.com/jenkins-x/jx (1 of 3 artifacts)
+    - name: jx-variables
+      runAfter:
+        - fetch-repository
+      image: ghcr.io/jenkins-x/jx-boot:3.10.86
+      script: |
+        #!/usr/bin/env sh
+        jx gitops variables 
+        jx gitops pr variables
+
+    # https://github.com/jenkins-x-plugins/jx-registry
+    - name: jx-registry
+      runAfter:
+        - jx-variables
+      image: ghcr.io/jenkins-x/jx-registry:0.1.10
+      env:
+        - name: CACHE_SUFFIX
+          value: '/cache'
+        - name: ECR_LIFECYCLE_POLICY
+          value: |-
+            {
+              "rules": [
+                {
+                  "rulePriority": 1,
+                  "description": "Expire images older than 180 days",
+                  "selection": {
+                    "tagStatus": "tagged",
+                    "countType": "sinceImagePushed",
+                    "tagPrefixList": ["0.0.0-"],
+                    "countUnit": "days",
+                    "countNumber": 180
+                  },
+                  "action": {
+                    "type": "expire"
+                  }
+                }
+              ]
+            }
+      script: |
+        #!/usr/bin/env sh
+        jx-registry create --app rewardops/mx-$(params.APP_NAME)
+
+    # https://github.com/GoogleContainerTools/kaniko
+    - name: build-and-push-docker
+      runAfter:
+        - jx-registry
+      image: gcr.io/kaniko-project/executor:v1.12.1-debug
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1000Mi
+        limits:
+          cpu: 1000m
+          memory: 2000Mi
+      script: |
+        #!/busybox/sh
+        source .jx/variables.sh
+        echo "APP_NAME = $APP_NAME"
+        echo "VERSION = $VERSION"
+
+        cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
+
+        echo ">>> Building PR mx-$(params.APP_NAME)"
+        /kaniko/executor \
+          --skip-unused-stages \
+          --cache=true \
+          --cache-repo=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/cache-mx-$(params.APP_NAME) \
+          --cache-copy-layers \
+          --cleanup \
+          --context=/workspace/source \
+          --dockerfile=apps/$(params.APP_NAME)/Dockerfile \
+          --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/mx-$(params.APP_NAME):$VERSION
+
+    # https://github.com/jenkins-x-plugins/jx-preview
+    - name: promote-preview
+      runAfter:
+        - build-and-push-docker
+      image: ghcr.io/jenkins-x-plugins/jx-preview:0.1.0
+      script: |
+        #!/usr/bin/env sh
+        source .jx/variables.sh
+        jx preview create --debug --service mx-$(params.APP_NAME)
