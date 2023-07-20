@@ -3,8 +3,6 @@ kind: Task
 metadata:
   name: mx-build-task
 spec:
-  workspaces:
-    - name: shared-data
   params:
     - name: APP_NAME
       type: string
@@ -24,6 +22,15 @@ spec:
         cpu: 500m
         memory: 1000Mi
     workingDir: /workspace/source
+  workspaces:
+    - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
   steps:
     # https://github.com/jenkins-x/jx3-pipeline-catalog/blob/master/tasks/git-clone/git-clone-pr.yaml
     - name: ''
@@ -71,11 +78,11 @@ spec:
 
     - name: save-secret
       image: bitnami/kubectl:latest
-      script: |
-        echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
       volumeMounts:
         - name: shared-data
           mountPath: /workspace/my-workspace
+      script: |
+        echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
 
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
