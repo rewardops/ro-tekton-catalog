@@ -93,6 +93,7 @@ spec:
         # Assuming secret data is in a json format
         # Get the secret data into a variable as a newline-separated list of 'key=value' pairs
         ENV_VARS=$(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")')
+        echo "ENV_VARS: $ENV_VARS"
 
         echo ">>> Building PR mx-$(params.APP_NAME)"
         /kaniko/executor \
