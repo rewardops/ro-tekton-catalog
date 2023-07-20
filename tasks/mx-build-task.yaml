@@ -75,7 +75,7 @@ spec:
         echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
       volumeMounts:
         - name: shared-data
-          mountPath: /workspace
+          mountPath: /workspace/source
 
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
@@ -131,4 +131,4 @@ spec:
         jx preview create --debug --service mx-$(params.APP_NAME)
       volumeMounts:
         - name: shared-data
-          mountPath: /workspace
+          mountPath: /workspace/source
