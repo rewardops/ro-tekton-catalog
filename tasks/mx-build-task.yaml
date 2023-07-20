@@ -90,6 +90,10 @@ spec:
 
         cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
 
+        # Assuming secret data is in a json format
+        # Get the secret data into a variable as a newline-separated list of 'key=value' pairs
+        ENV_VARS=$(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")')
+
         echo ">>> Building PR mx-$(params.APP_NAME)"
         /kaniko/executor \
           --skip-unused-stages \
@@ -100,7 +104,8 @@ spec:
           --context=/workspace/source \
           --dockerfile=apps/$(params.APP_NAME)/Dockerfile \
           --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/mx-$(params.APP_NAME):$VERSION \
-          --build-arg NPM_TOKEN=$NPM_TOKEN
+          --build-arg NPM_TOKEN=$NPM_TOKEN \
+          --build-arg ENV_VARS="$ENV_VARS"
 
     # https://github.com/jenkins-x-plugins/jx-preview
     - name: promote-preview
