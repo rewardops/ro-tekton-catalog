@@ -22,13 +22,13 @@ spec:
     workingDir: /workspace/source
   steps:
     # https://github.com/jenkins-x/jx3-pipeline-catalog/blob/master/tasks/git-clone/git-clone-pr.yaml
-    - name: '' # fetch-repository
+    - name: 'fetch-repository'
       image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
 
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
     - name: jx-variables
-      # runAfter:
-      #   - fetch-repository
+      runAfter:
+        - fetch-repository
       image: ghcr.io/jenkins-x/jx-boot:3.10.86
       script: |
         #!/usr/bin/env sh
