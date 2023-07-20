@@ -22,7 +22,7 @@ spec:
     workingDir: /workspace/source
   steps:
     # https://github.com/jenkins-x/jx3-pipeline-catalog/blob/master/tasks/git-clone/git-clone-pr.yaml
-    - name: '' # fetch-repository
+    - name: ''
       image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
 
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
