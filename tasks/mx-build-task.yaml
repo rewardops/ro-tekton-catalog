@@ -80,7 +80,7 @@ spec:
       image: bitnami/kubectl:latest
       volumeMounts:
         - name: shared-data
-          mountPath: /workspace/my-workspace
+          mountPath: /workspace/
       script: |
         echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
 
@@ -99,6 +99,9 @@ spec:
         limits:
           cpu: 2000m
           memory: 4000Mi
+      volumeMounts:
+        - name: shared-data
+          mountPath: /workspace/
       script: |
         #!/busybox/sh
         source .jx/variables.sh
@@ -136,6 +139,3 @@ spec:
         #!/usr/bin/env sh
         source .jx/variables.sh
         jx preview create --debug --service mx-$(params.APP_NAME)
-      volumeMounts:
-        - name: shared-data
-          mountPath: /workspace/my-workspace
