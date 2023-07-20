@@ -90,6 +90,8 @@ spec:
 
         cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
 
+        export NPM_TOKEN=$NPM_TOKEN
+
         echo ">>> Building PR mx-$(params.APP_NAME)"
         /kaniko/executor \
           --skip-unused-stages \
