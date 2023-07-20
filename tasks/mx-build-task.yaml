@@ -70,6 +70,9 @@ spec:
       # runAfter:
       #   - jx-registry
       image: gcr.io/kaniko-project/executor:v1.12.1-debug
+      env:
+        - name: NPM_CONFIG_USERCONFIG
+          value: /tekton/home/npm/.npmrc
       resources:
         requests:
           cpu: 500m
