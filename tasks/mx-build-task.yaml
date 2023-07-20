@@ -27,8 +27,8 @@ spec:
 
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
     - name: jx-variables
-      runAfter:
-        - fetch-repository
+      # runAfter:
+      #   - fetch-repository
       image: ghcr.io/jenkins-x/jx-boot:3.10.86
       script: |
         #!/usr/bin/env sh
@@ -37,8 +37,8 @@ spec:
 
     # https://github.com/jenkins-x-plugins/jx-registry
     - name: jx-registry
-      runAfter:
-        - jx-variables
+      # runAfter:
+      #   - jx-variables
       image: ghcr.io/jenkins-x/jx-registry:0.1.10
       env:
         - name: CACHE_SUFFIX
@@ -69,8 +69,8 @@ spec:
 
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
-      runAfter:
-        - jx-registry
+      # runAfter:
+      #   - jx-registry
       image: gcr.io/kaniko-project/executor:v1.12.1-debug
       resources:
         requests:
@@ -100,8 +100,8 @@ spec:
 
     # https://github.com/jenkins-x-plugins/jx-preview
     - name: promote-preview
-      runAfter:
-        - build-and-push-docker
+      # runAfter:
+      #   - build-and-push-docker
       image: ghcr.io/jenkins-x-plugins/jx-preview:0.1.0
       script: |
         #!/usr/bin/env sh
