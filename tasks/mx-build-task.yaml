@@ -91,6 +91,8 @@ spec:
         cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
 
         export NPM_TOKEN=$NPM_TOKEN
+        echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> /root/.npmrc
+        echo "@rewardops:registry=https://npm.pkg.github.com/" >> /root/.npmrc
 
         echo ">>> Building PR mx-$(params.APP_NAME)"
         /kaniko/executor \
