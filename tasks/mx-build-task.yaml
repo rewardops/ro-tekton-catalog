@@ -69,7 +69,7 @@ spec:
         #!/usr/bin/env sh
         jx-registry create --app rewardops/mx-$(params.APP_NAME)
 
-    - name: apply-secret
+    - name: save-secret
       image: bitnami/kubectl:latest
       script: |
         echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
