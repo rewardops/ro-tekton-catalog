@@ -3,6 +3,8 @@ kind: Task
 metadata:
   name: mx-build-task
 spec:
+  workspaces:
+    - name: shared-data
   params:
     - name: APP_NAME
       type: string
@@ -67,6 +69,14 @@ spec:
         #!/usr/bin/env sh
         jx-registry create --app rewardops/mx-$(params.APP_NAME)
 
+    - name: apply-secret
+      image: bitnami/kubectl:latest
+      script: |
+        echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
+      volumeMounts:
+        - name: shared-data
+          mountPath: /workspace
+
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
       # runAfter:
@@ -92,7 +102,9 @@ spec:
 
         # Assuming secret data is in a json format
         # Get the secret data into a variable as a newline-separated list of 'key=value' pairs
-        ENV_VARS=$(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")')
+        # ENV_VARS=$(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")')
+
+        ENV_VARS=$(cat $(workspaces.shared-data.path)/env-vars)
         echo "ENV_VARS: $ENV_VARS"
 
         echo ">>> Building PR mx-$(params.APP_NAME)"
@@ -117,3 +129,6 @@ spec:
         #!/usr/bin/env sh
         source .jx/variables.sh
         jx preview create --debug --service mx-$(params.APP_NAME)
+      volumeMounts:
+        - name: shared-data
+          mountPath: /workspace
