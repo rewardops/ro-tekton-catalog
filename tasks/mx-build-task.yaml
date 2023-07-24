@@ -85,6 +85,12 @@ spec:
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
       image: gcr.io/kaniko-project/executor:v1.12.1-debug
+      env:
+        - name: NPM_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: build-$(params.APP_NAME)
+              key: 'NPM_TOKEN'
       envFrom:
         - secretRef:
             name: build-$(params.APP_NAME)
