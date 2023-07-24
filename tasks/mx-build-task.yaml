@@ -22,19 +22,26 @@ spec:
         cpu: 500m
         memory: 1000Mi
     workingDir: /workspace/source
-  workspaces:
-    - name: shared-data
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
   steps:
     # https://github.com/jenkins-x/jx3-pipeline-catalog/blob/master/tasks/git-clone/git-clone-pr.yaml
     - name: ''
       image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+
+    - name: apply-secret
+      image: bitnami/kubectl:latest
+      script: |
+        echo "
+        apiVersion: 'kubernetes-client.io/v1'
+        kind: ExternalSecret
+        metadata:
+          name: build-$(params.APP_NAME)
+        spec:
+          backendType: vault
+          vaultMountPoint: 'kubernetes'
+          vaultRole: 'jx-vault'
+          dataFrom:
+            - 'io/data/rewardops/jx/preview/$(params.APP_NAME)'
+        " | kubectl apply -f -
 
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
     - name: jx-variables
@@ -43,11 +50,10 @@ spec:
         #!/usr/bin/env sh
         jx gitops variables 
         jx gitops pr variables
+        sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
 
     # https://github.com/jenkins-x-plugins/jx-registry
     - name: jx-registry
-      # runAfter:
-      #   - jx-variables
       image: ghcr.io/jenkins-x/jx-registry:0.1.10
       env:
         - name: CACHE_SUFFIX
@@ -76,22 +82,12 @@ spec:
         #!/usr/bin/env sh
         jx-registry create --app rewardops/mx-$(params.APP_NAME)
 
-    - name: save-secret
-      image: bitnami/kubectl:latest
-      volumeMounts:
-        - name: shared-data
-          mountPath: /workspace/
-      script: |
-        echo $(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")') > $(workspaces.shared-data.path)/env-vars
-
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
-      # runAfter:
-      #   - jx-registry
       image: gcr.io/kaniko-project/executor:v1.12.1-debug
-      env:
-        - name: NPM_TOKEN
-          value: $(params.NPM_TOKEN)
+      envFrom:
+        - secretRef:
+            name: build-$(params.APP_NAME)
       resources:
         requests:
           cpu: 500m
@@ -99,26 +95,22 @@ spec:
         limits:
           cpu: 2000m
           memory: 4000Mi
-      volumeMounts:
-        - name: shared-data
-          mountPath: /workspace/
       script: |
-        #!/busybox/sh
+        #!/bin/sh
         source .jx/variables.sh
         echo "APP_NAME = $APP_NAME"
         echo "VERSION = $VERSION"
 
         cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
 
-        # Assuming secret data is in a json format
-        # Get the secret data into a variable as a newline-separated list of 'key=value' pairs
-        # ENV_VARS=$(kubectl get secret build-$(params.APP_NAME) -o json | jq -r '.data | map_values(@base64d) | to_entries | map("\(.key)=\(.value)") | join("\n")')
-
-        ENV_VARS=$(cat $(workspaces.shared-data.path)/env-vars)
-        echo "ENV_VARS: $ENV_VARS"
+        # Loop through environment variables and write them to a file
+        printenv | while IFS='=' read -r name value; do
+            # Print each environment variable in the format: key="value"
+            echo "$name=\"$value\"" >> env_vars_flat.txt
+        done
 
         echo ">>> Building PR mx-$(params.APP_NAME)"
-        /kaniko/executor \
+        eval /kaniko/executor \
           --skip-unused-stages \
           --cache=true \
           --cache-repo=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/cache-mx-$(params.APP_NAME) \
@@ -127,13 +119,11 @@ spec:
           --context=/workspace/source \
           --dockerfile=apps/$(params.APP_NAME)/Dockerfile \
           --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/mx-$(params.APP_NAME):$VERSION \
-          --build-arg NPM_TOKEN=$NPM_TOKEN \
-          --build-arg ENV_VARS="$ENV_VARS"
+          --build-arg NPM_TOKEN="$NPM_TOKEN" \
+          --build-arg ENV_VARS_CONTEXT=env_vars_flat.txt
 
     # https://github.com/jenkins-x-plugins/jx-preview
     - name: promote-preview
-      # runAfter:
-      #   - build-and-push-docker
       image: ghcr.io/jenkins-x-plugins/jx-preview:0.1.0
       script: |
         #!/usr/bin/env sh
