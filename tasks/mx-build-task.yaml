@@ -81,6 +81,7 @@ spec:
       script: |
         #!/usr/bin/env sh
         jx-registry create --app rewardops/mx-$(params.APP_NAME)
+        jx-registry create --app rewardops/cache-mx-$(params.APP_NAME)
 
     # https://github.com/GoogleContainerTools/kaniko
     - name: build-and-push-docker
