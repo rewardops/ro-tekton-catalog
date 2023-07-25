@@ -134,4 +134,4 @@ spec:
       script: |
         #!/usr/bin/env sh
         source .jx/variables.sh
-        jx preview create --debug --service mx-$(params.APP_NAME)
+        jx preview create -f infra/preview/helmfile.yaml --debug --service mx-$(params.APP_NAME)
