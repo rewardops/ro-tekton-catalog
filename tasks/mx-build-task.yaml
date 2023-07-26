@@ -141,3 +141,27 @@ spec:
         #!/usr/bin/env sh
         source .jx/variables.sh
         jx preview create -f infra/preview/helmfile.yaml --debug --service mx-$(params.APP_NAME)
+
+    # https://github.com/jenkins-x/jx (1 of 3 artifacts)
+    - name: promote-helm-release
+      image: ghcr.io/jenkins-x/jx-boot:3.10.86
+      script: |
+        #!/usr/bin/env sh
+        VERSION=$(cat VERSION)
+        SEMVER=$(cat /tekton/results/next-version)
+        cp /tekton/results/next-version VERSION
+        sed -i "s/$VERSION/$SEMVER/" .jx/variables.sh
+        source .jx/variables.sh
+
+        # https://jenkins-x.io/v3/develop/reference/jx/gitops/helm/release/
+        jx gitops helm release -n mx-$(params.APP_NAME)
+
+    # https://github.com/jenkins-x-plugins/jx-promote
+    - name: promote-jx-promote
+      image: ghcr.io/jenkins-x-plugins/jx-promote:0.6.5
+      script: |
+        #!/usr/bin/env sh
+        source .jx/variables.sh
+        jx promote -a mx-$(params.APP_NAME) -b --timeout 1h --no-poll --env staging
+        # jx promote -a mx-$(params.APP_NAME) -b --timeout 1h --no-poll --env uat
+        # jx promote -a mx-$(params.APP_NAME) -b --timeout 1h --no-poll --env prod-mx-$(params.APP_NAME)
