@@ -112,9 +112,9 @@ spec:
 
         # Loop through environment variables and write them to a file
         printenv | while IFS='=' read -r name value; do
-            # Check if the variable should be replaced as the URL
-            if [[ $name == "NEXT_PUBLIC_URL" ]] || [[ $name == "NEXTAUTH_URL" ]]; then
-                # If the name matches, replace the value
+            # Check if the variable should be replaced as the URL, and the value is empty
+            if { [[ $name == "NEXT_PUBLIC_URL" ]] || [[ $name == "NEXTAUTH_URL" ]]; } && [[ -z $value ]]; then
+                # If the name matches and the value is empty, replace the value
                 value="https://mx-$(params.APP_NAME)-pr${PULL_NUMBER}.jx.rewardops.io"
             fi
             # Print each environment variable in the format: key="value"
