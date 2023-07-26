@@ -142,6 +142,27 @@ spec:
         source .jx/variables.sh
         jx preview create -f infra/preview/helmfile.yaml --debug --service mx-$(params.APP_NAME)
 
+    # https://github.com/jenkins-x-plugins/jx-changelog
+    - name: promote-changelog
+      image: ghcr.io/jenkins-x/jx-changelog:0.10.3
+      script: |
+        #!/usr/bin/env sh
+        source .jx/variables.sh
+
+        if [ -d "infra/charts/mx-store" ]; then
+        jx gitops yset -p version -v "$SEMVER" -f ./infra/charts/mx-store/Chart.yaml
+        jx gitops yset -p appVersion -v "$SEMVER" -f ./infra/charts/mx-store/Chart.yaml
+        jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG -f ./infra/charts/mx-store/values.yaml
+        jx gitops yset -p 'image.tag' -v "$SEMVER" -f ./infra/charts/mx-store/values.yaml;
+        else echo no charts; fi
+
+        git add * || true
+        git commit -a -m "chore: release $VERSION" --allow-empty
+        git tag -fa $VERSION -m "Release version $VERSION"
+        git push --force origin $VERSION
+
+        jx changelog create --version ${VERSION}
+
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
     - name: promote-helm-release
       image: ghcr.io/jenkins-x/jx-boot:3.10.86
