@@ -43,6 +43,22 @@ spec:
             - 'io/data/rewardops/jx/preview/$(params.APP_NAME)'
         " | kubectl apply -f -
 
+    - name: apply-secret-stg
+      image: bitnami/kubectl:latest
+      script: |
+        echo "
+        apiVersion: 'kubernetes-client.io/v1'
+        kind: ExternalSecret
+        metadata:
+          name: build-$(params.APP_NAME)
+        spec:
+          backendType: vault
+          vaultMountPoint: 'kubernetes'
+          vaultRole: 'jx-vault'
+          dataFrom:
+            - 'io/data/rewardops/jx/staging/$(params.APP_NAME)'
+        " | kubectl apply -f -
+
     # https://github.com/jenkins-x/jx (1 of 3 artifacts)
     - name: jx-variables
       image: ghcr.io/jenkins-x/jx-boot:3.10.86
@@ -50,7 +66,15 @@ spec:
         #!/usr/bin/env sh
         jx gitops variables 
         jx gitops pr variables
-        sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+
+        echo "export PROGRAM_NAME=$(params.APP_NAME)" >> /workspace/source/.jx/variables.sh
+        echo "export CLIENT_NAME=$(params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
+
+        if [ -n "$(params.CLIENT_NAME)" ]; then
+          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.CLIENT_NAME)-$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+        else
+          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+        fi
 
     # https://github.com/jenkins-x-plugins/jx-registry
     - name: jx-registry
@@ -64,13 +88,13 @@ spec:
               "rules": [
                 {
                   "rulePriority": 1,
-                  "description": "Expire images older than 180 days",
+                  "description": "Expire images older than 14 days",
                   "selection": {
                     "tagStatus": "tagged",
                     "countType": "sinceImagePushed",
                     "tagPrefixList": ["0.0.0-"],
                     "countUnit": "days",
-                    "countNumber": 180
+                    "countNumber": 14
                   },
                   "action": {
                     "type": "expire"
@@ -129,7 +153,7 @@ spec:
           --cache-copy-layers \
           --cleanup \
           --context=/workspace/source \
-          --dockerfile=apps/$(params.APP_NAME)/Dockerfile \
+          --dockerfile=apps/$(params.PROGRAM_NAME)/Dockerfile \
           --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/mx-$(params.APP_NAME):$VERSION \
           --build-arg NPM_TOKEN="$NPM_TOKEN" \
           --build-arg ENV_VARS_CONTEXT=env_vars_flat.txt
