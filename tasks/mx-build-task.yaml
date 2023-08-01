@@ -46,38 +46,37 @@ spec:
 
     - name: apply-secret
       image: bitnami/kubectl:latest
-      env:
-        - name: APP_NAME
-          value: params.APP_NAME
       script: |
-        echo "
-        apiVersion: 'kubernetes-client.io/v1'
-        kind: ExternalSecret
-        metadata:
-          name: build-$(params.APP_NAME)
-        spec:
-          backendType: vault
-          vaultMountPoint: 'kubernetes'
-          vaultRole: 'jx-vault'
-          dataFrom:
-            - 'io/data/rewardops/jx/preview/$(params.APP_NAME)'
-        " | kubectl apply -f -
+        exit
+        # echo "
+        # apiVersion: 'kubernetes-client.io/v1'
+        # kind: ExternalSecret
+        # metadata:
+        #   name: build-$(params.APP_NAME)
+        # spec:
+        #   backendType: vault
+        #   vaultMountPoint: 'kubernetes'
+        #   vaultRole: 'jx-vault'
+        #   dataFrom:
+        #     - 'io/data/rewardops/jx/preview/$(params.APP_NAME)'
+        # " | kubectl apply -f -
 
     - name: apply-secret-stg
       image: bitnami/kubectl:latest
       script: |
-        echo "
-        apiVersion: 'kubernetes-client.io/v1'
-        kind: ExternalSecret
-        metadata:
-          name: build-$(params.APP_NAME)
-        spec:
-          backendType: vault
-          vaultMountPoint: 'kubernetes'
-          vaultRole: 'jx-vault'
-          dataFrom:
-            - 'io/data/rewardops/jx/staging/$(params.APP_NAME)'
-        " | kubectl apply -f -
+        exit
+        # echo "
+        # apiVersion: 'kubernetes-client.io/v1'
+        # kind: ExternalSecret
+        # metadata:
+        #   name: build-$(params.APP_NAME)
+        # spec:
+        #   backendType: vault
+        #   vaultMountPoint: 'kubernetes'
+        #   vaultRole: 'jx-vault'
+        #   dataFrom:
+        #     - 'io/data/rewardops/jx/staging/$(params.APP_NAME)'
+        # " | kubectl apply -f -
 
     # https://github.com/jenkins-x-plugins/jx-registry
     - name: jx-registry
