@@ -48,7 +48,7 @@ spec:
       image: bitnami/kubectl:latest
       script: |
         #!/usr/bin/env sh
-        source .jx/variables.sh
+        source /workspace/spurce/.jx/variables.sh
         echo "
         apiVersion: 'kubernetes-client.io/v1'
         kind: ExternalSecret
