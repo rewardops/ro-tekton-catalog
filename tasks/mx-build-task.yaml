@@ -8,6 +8,8 @@ spec:
       type: string
     - name: NPM_TOKEN
       type: string
+    - name: CLIENT_NAME
+      type: string
   stepTemplate:
     env:
       - name: NPM_CONFIG_USERCONFIG
