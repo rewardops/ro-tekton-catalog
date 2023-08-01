@@ -68,9 +68,9 @@ spec:
         jx gitops pr variables
 
         echo "export PROGRAM_NAME=$(params.APP_NAME)" >> /workspace/source/.jx/variables.sh
-        echo "export CLIENT_NAME=$(params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
 
         if [ -n "$(params.CLIENT_NAME)" ]; then
+          echo "export CLIENT_NAME=$(params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
           sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.CLIENT_NAME)-$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
         else
           sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
