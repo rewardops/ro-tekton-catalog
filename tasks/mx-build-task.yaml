@@ -67,14 +67,14 @@ spec:
         jx gitops variables 
         jx gitops pr variables
 
-        #echo "export PROGRAM_NAME=$params.APP_NAME" >> /workspace/source/.jx/variables.sh
-        #echo "export CLIENT_NAME=$(echo params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
+        echo "export PROGRAM_NAME=$params.APP_NAME" >> /workspace/source/.jx/variables.sh
+        echo "export CLIENT_NAME=$(echo params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
 
-        #if [ -n "$(params.CLIENT_NAME)" ]; then
-        #  sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.CLIENT_NAME)-$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
-        #else
-        #  sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
-        #fi
+        if [ -n "$(params.CLIENT_NAME)" ]; then
+          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.CLIENT_NAME)-$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+        else
+          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+        fi
 
     # https://github.com/jenkins-x-plugins/jx-registry
     - name: jx-registry
