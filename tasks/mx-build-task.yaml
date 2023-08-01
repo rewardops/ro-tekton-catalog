@@ -27,6 +27,23 @@ spec:
     - name: ''
       image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
 
+    # https://github.com/jenkins-x/jx (1 of 3 artifacts)
+    - name: jx-variables
+      image: ghcr.io/jenkins-x/jx-boot:3.10.86
+      script: |
+        #!/usr/bin/env sh
+        jx gitops variables 
+        jx gitops pr variables
+
+        echo "export PROGRAM_NAME=$params.APP_NAME" >> /workspace/source/.jx/variables.sh
+        echo "export CLIENT_NAME=$(echo params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
+
+        if [ -n "$(params.CLIENT_NAME)" ]; then
+          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.CLIENT_NAME)-$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+        else
+          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
+        fi
+
     - name: apply-secret
       image: bitnami/kubectl:latest
       script: |
@@ -59,23 +76,6 @@ spec:
           dataFrom:
             - 'io/data/rewardops/jx/staging/$(params.APP_NAME)'
         " | kubectl apply -f -
-
-    # https://github.com/jenkins-x/jx (1 of 3 artifacts)
-    - name: jx-variables
-      image: ghcr.io/jenkins-x/jx-boot:3.10.86
-      script: |
-        #!/usr/bin/env sh
-        jx gitops variables 
-        jx gitops pr variables
-
-        echo "export PROGRAM_NAME=$params.APP_NAME" >> /workspace/source/.jx/variables.sh
-        echo "export CLIENT_NAME=$(echo params.CLIENT_NAME)" >> /workspace/source/.jx/variables.sh
-
-        if [ -n "$(params.CLIENT_NAME)" ]; then
-          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.CLIENT_NAME)-$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
-        else
-          sed -i 's/^export APP_NAME=.*/export APP_NAME="$(params.APP_NAME)"/' /workspace/source/.jx/variables.sh
-        fi
 
     # https://github.com/jenkins-x-plugins/jx-registry
     - name: jx-registry
