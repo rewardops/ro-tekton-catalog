@@ -30,6 +30,7 @@ spec:
     - name: apply-secret
       image: bitnami/kubectl:latest
       script: |
+        source .jx/variables.sh
         echo "
         apiVersion: 'kubernetes-client.io/v1'
         kind: ExternalSecret
