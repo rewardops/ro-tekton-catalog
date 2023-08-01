@@ -131,10 +131,10 @@ spec:
       script: |
         #!/bin/sh
         source .jx/variables.sh
-        echo "CLIENT_NAME = $CLIENT_NAME"
-        echo "PROGRAM_NAME = $PROGRAM_NAME"
-        echo "APP_NAME = $APP_NAME"
-        echo "VERSION = $VERSION"
+        #echo "CLIENT_NAME = $CLIENT_NAME"
+        #echo "PROGRAM_NAME = $PROGRAM_NAME"
+        #echo "APP_NAME = $APP_NAME"
+        #echo "VERSION = $VERSION"
 
         cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
 
