@@ -47,7 +47,7 @@ spec:
     - name: apply-secret
       image: bitnami/kubectl:latest
       script: |
-        #!/bin/bash
+        #!/usr/bin/env sh
         source .jx/variables.sh
         echo "
         apiVersion: 'kubernetes-client.io/v1'
