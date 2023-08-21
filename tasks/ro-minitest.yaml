@@ -17,9 +17,9 @@ spec:
       description: Latest pii_service image 
       type: string
       default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_service:latest"
-  results:
-    - name: minitest
-      description: Run Tests
+  #  results:
+  #    - name: minitest
+  #      description: Run Tests
   steps:
     - name: minitest
       image: $(params.BASE_IMAGE)
