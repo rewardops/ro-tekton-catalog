@@ -17,9 +17,6 @@ spec:
       description: Latest pii_service image 
       type: string
       default: "016157711389.dkr.ecr.us-east-1.amazonaws.com/rewardops/pii_service:latest"
-  results:
-    - name: brakeman
-      description: Run Tests
   steps:
     - name: brakeman
       image: $(params.BASE_IMAGE)
